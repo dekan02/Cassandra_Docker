@@ -1,0 +1,6 @@
+.DS_Store
+./venv
+
+./cassandra/data/node1/
+./cassandra/data/node2/
+./cassandra/data/node3/
