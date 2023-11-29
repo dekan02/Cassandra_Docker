@@ -2,5 +2,5 @@
 Create a docker container for cassandra
 
 '''
-docker-compose up -d
+  docker-compose up -d
 '''
