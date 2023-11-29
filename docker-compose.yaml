@@ -1,0 +1,70 @@
+version: '3'
+
+services:
+  # cassandra:
+  #   build: ./cassandra
+  #   container_name: cassandra_ds
+  #   env_file:
+  #     - ./cassandra/cassandra.env
+  #   volumes:
+  #     - ./cassandra/data:/var/lib/cassandra/data
+  #   ports:
+  #     - 7000:7000
+  #     - 7001:7001
+  #     - 9042:9042
+
+  cas1:
+    container_name: cas1
+    image: cassandra:latest
+    volumes:
+      - ./cassandra/data/node1:/var/lib/cassandra/data
+      - ./cassandra/schema.sql:/docker-entrypoint-initdb.d/
+    expose:
+      - 9042
+      - 7000
+      - 7001
+      - 9160
+    env_file:
+      - ./env_vars/.env_cass
+    # environment:
+    #   - CASSANDRA_BROADCAST_ADDRESS=10.7.108.10
+  
+  cas2:
+    container_name: cas2
+    image: cassandra:latest
+    volumes:
+      - ./cassandra/data/node2:/var/lib/cassandra/data
+    depends_on:
+      - cas1
+    links:
+      - cas1
+    env_file:
+      - ./env_vars/.env_cass
+    # environment:
+    #   - CASSANDRA_BROADCAST_ADDRESS=10.7.108.11
+  
+  cas3:
+    container_name: cas3
+    image: cassandra:latest
+    volumes:
+      - ./cassandra/data/node3:/var/lib/cassandra/data
+    depends_on:
+      - cas1
+    env_file:
+      - ./env_vars/.env_cass
+    # environment:
+    #   - CASSANDRA_BROADCAST_ADDRESS=10.7.108.12
+  
+  load-keyspace:
+    container_name: init-keyspace
+    image: cassandra:latest
+    depends_on:
+      - cas1
+    volumes:
+      - ./cassandra/schema.sql:/schema.sql
+    command: /bin/bash -c "sleep 40 && echo loading cassandra keyspace && cqlsh cas1 -f /schema.sql"
+
+volumes:
+  cas1:
+  cas2:
+  cas3:
