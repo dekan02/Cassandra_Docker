@@ -23,6 +23,8 @@ services:
       - 7000
       - 7001
       - 9160
+    ports:
+      - 9042:9042
     env_file:
       - ./env_vars/.env_cass
     # environment:
